@@ -3,19 +3,21 @@
 (function () {
 
     var util = {},
-        position = {},
-        ui = {},
-        doc = window.document,
-        re = window.RegExp,
-        nav = window.navigator,
-        SETTINGS = { lineLength: 72 },
+    position = {},
+    ui = {},
+    doc = window.document,
+    re = window.RegExp,
+    nav = window.navigator,
+    SETTINGS = {
+        lineLength: 72
+    },
 
     // Used to work around some browser bugs where we can't use feature testing.
-        uaSniffed = {
-            isIE: /msie/.test(nav.userAgent.toLowerCase()),
-            isIE_5or6: /msie 6/.test(nav.userAgent.toLowerCase()) || /msie 5/.test(nav.userAgent.toLowerCase()),
-            isOpera: /opera/.test(nav.userAgent.toLowerCase())
-        };
+    uaSniffed = {
+        isIE: /msie/.test(nav.userAgent.toLowerCase()),
+        isIE_5or6: /msie 6/.test(nav.userAgent.toLowerCase()) || /msie 5/.test(nav.userAgent.toLowerCase()),
+        isOpera: /opera/.test(nav.userAgent.toLowerCase())
+    };
 
 
     // -------------------------------------------------------------------
@@ -61,10 +63,12 @@
                                                   * image url (or null if the user cancelled). If this hook returns false, the default dialog will be used.
                                                   */
 
-        this.getConverter = function () { return markdownConverter; }
+        this.getConverter = function () {
+            return markdownConverter;
+        }
 
         var that = this,
-            panels;
+        panels;
 
         this.run = function () {
             if (panels)
@@ -72,7 +76,9 @@
 
             panels = new PanelCollection(idPostfix);
             var commandManager = new CommandManager(hooks);
-            var previewManager = new PreviewManager(markdownConverter, panels, function () { hooks.onPreviewRefresh(); });
+            var previewManager = new PreviewManager(markdownConverter, panels, function () {
+                hooks.onPreviewRefresh();
+            });
             var undoManager, uiManager;
 
             if (!/\?noundo/.test(doc.location.href)) {
@@ -90,8 +96,12 @@
 
             uiManager = new UIManager(idPostfix, panels, undoManager, previewManager, commandManager, help);
             uiManager.setUndoRedoButtonStates();
+            
+            var inputManager = new InputManager(panels);
 
-            var forceRefresh = that.refreshPreview = function () { previewManager.refresh(true); };
+            var forceRefresh = that.refreshPreview = function () {
+                previewManager.refresh(true);
+            };
 
             forceRefresh();
         };
@@ -157,8 +167,14 @@
         if (remove) {
             beforeReplacer = afterReplacer = "";
         } else {
-            beforeReplacer = function (s) { that.before += s; return ""; }
-            afterReplacer = function (s) { that.after = s + that.after; return ""; }
+            beforeReplacer = function (s) {
+                that.before += s;
+                return "";
+            }
+            afterReplacer = function (s) {
+                that.after = s + that.after;
+                return "";
+            }
         }
         
         this.selection = this.selection.replace(/^(\s*)/, beforeReplacer).replace(/(\s*)$/, afterReplacer);
@@ -797,13 +813,13 @@
                 result = window.pageYOffset;
             }
             else
-                if (doc.documentElement && doc.documentElement.scrollTop) {
-                    result = doc.documentElement.scrollTop;
-                }
-                else
-                    if (doc.body) {
-                        result = doc.body.scrollTop;
-                    }
+            if (doc.documentElement && doc.documentElement.scrollTop) {
+                result = doc.documentElement.scrollTop;
+            }
+            else
+            if (doc.body) {
+                result = doc.body.scrollTop;
+            }
 
             return result;
         };
@@ -971,7 +987,7 @@
     ui.createBackground = function () {
 
         var background = doc.createElement("div"),
-            style = background.style;
+        style = background.style;
         
         background.className = "wmd-prompt-background";
         
@@ -1076,8 +1092,10 @@
 
             // The web form container for the text box and buttons.
             var form = doc.createElement("form"),
-                style = form.style;
-            form.onsubmit = function () { return close(false); };
+            style = form.style;
+            form.onsubmit = function () {
+                return close(false);
+            };
             style.padding = "0";
             style.margin = "0";
             style.cssFloat = "left";
@@ -1099,7 +1117,9 @@
             // The ok button
             var okButton = doc.createElement("input");
             okButton.type = "button";
-            okButton.onclick = function () { return close(false); };
+            okButton.onclick = function () {
+                return close(false);
+            };
             okButton.value = "OK";
             style = okButton.style;
             style.margin = "10px";
@@ -1110,7 +1130,9 @@
             // The cancel button
             var cancelButton = doc.createElement("input");
             cancelButton.type = "button";
-            cancelButton.onclick = function () { return close(true); };
+            cancelButton.onclick = function () {
+                return close(true);
+            };
             cancelButton.value = "Cancel";
             style = cancelButton.style;
             style.margin = "10px";
@@ -1164,7 +1186,7 @@
     function UIManager(postfix, panels, undoManager, previewManager, commandManager, helpOptions) {
 
         var inputBox = panels.input,
-            buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
+        buttons = {}; // buttons.undo, buttons.link, etc. The actual DOM elements.
 
         makeSpritedButtonRow();
 
@@ -1371,7 +1393,9 @@
         function bindCommand(method) {
             if (typeof method === "string")
                 method = commandManager[method];
-            return function () { method.apply(commandManager, arguments); }
+            return function () {
+                method.apply(commandManager, arguments);
+            }
         }
 
         function makeSpritedButtonRow() {
@@ -1433,14 +1457,18 @@
             buttons.hr = makeButton("wmd-hr-button", "Horizontal Rule <hr> Ctrl+R", "-180px", bindCommand("doHorizontalRule"));
             makeSpacer(3);
             buttons.undo = makeButton("wmd-undo-button", "Undo - Ctrl+Z", "-200px", null);
-            buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
+            buttons.undo.execute = function (manager) {
+                if (manager) manager.undo();
+            };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
-                "Redo - Ctrl+Y" :
-                "Redo - Ctrl+Shift+Z"; // mac and other non-Windows platforms
+            "Redo - Ctrl+Y" :
+            "Redo - Ctrl+Shift+Z"; // mac and other non-Windows platforms
 
             buttons.redo = makeButton("wmd-redo-button", redoTitle, "-220px", null);
-            buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
+            buttons.redo.execute = function (manager) {
+                if (manager) manager.redo();
+            };
 
             if (helpOptions) {
                 var helpButton = document.createElement("li");
@@ -1491,7 +1519,7 @@
     commandProto.wrap = function (chunk, len) {
         this.unwrap(chunk);
         var regex = new re("(.{1," + len + "})( +|$\\n?)", "gm"),
-            that = this;
+        that = this;
 
         chunk.selection = chunk.selection.replace(regex, function (line, marked) {
             if (new re("^" + that.prefixes, "").test(line)) {
@@ -1739,7 +1767,7 @@
     commandProto.doAutoindent = function (chunk, postProcessing) {
 
         var commandMgr = this,
-            fakeSelection = false;
+        fakeSelection = false;
 
         chunk.before = chunk.before.replace(/(\n|^)[ ]{0,3}([*+-]|\d+[.])[ \t]*\n$/, "\n\n");
         chunk.before = chunk.before.replace(/(\n|^)[ ]{0,3}>[ \t]*\n$/, "\n\n");
@@ -1828,8 +1856,8 @@
         // lines and checks for a), b), and c).
 
         var match = "",
-            leftOver = "",
-            line;
+        leftOver = "",
+        line;
         if (chunk.before) {
             var lines = chunk.before.replace(/\n$/, "").split("\n");
             var inChain = false;
@@ -1873,7 +1901,7 @@
                 chunk.endTag = totalMatch;
                 return "";
             }
-        );
+            );
 
         var replaceBlanksInTags = function (useBracket) {
 
@@ -1916,10 +1944,10 @@
 
         if (!/\n/.test(chunk.selection)) {
             chunk.selection = chunk.selection.replace(/^(> *)/,
-            function (wholeMatch, blanks) {
-                chunk.startTag += blanks;
-                return "";
-            });
+                function (wholeMatch, blanks) {
+                    chunk.startTag += blanks;
+                    return "";
+                });
         }
     };
 
@@ -2155,6 +2183,67 @@
         chunk.selection = "";
         chunk.skipLines(2, 1, true);
     }
+    
+    // -------------------------------------------------------------------
+    // extra features from ludolph-pagedown here
+    // -------------------------------------------------------------------
+    
+    // InputManager will add extra input to the textarea
+    // eg. tab support
+    function InputManager(panels) {
+        var handleTab = function (event) {
+            // -----------------------------------------------------------------
+            // code addopted from http://pallieter.org/Projects/insertTab/
+            // -----------------------------------------------------------------
+            function insertTab(o, e)
+            {
+                var kC = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
+                if (kC == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey)
+                {
+                    var oS = o.scrollTop;
+                    if (o.setSelectionRange)
+                    {
+                        var sS = o.selectionStart;
+                        var sE = o.selectionEnd;
+                        o.value = o.value.substring(0, sS) + "\t" + o.value.substr(sE);
+                        o.setSelectionRange(sS + 1, sS + 1);
+                        o.focus();
+                    }
+                    else if (o.createTextRange)
+                    {
+                        document.selection.createRange().text = "\t";
+                        e.returnValue = false;
+                    }
+                    o.scrollTop = oS;
+                    if (e.preventDefault)
+                    {
+                        e.preventDefault();
+                    }
+                    return true;
+                }
+                return false;
+            }
+            var handled = insertTab(panels.input, event)
 
+            if (handled) {
+                if (event.preventDefault) {
+                    event.preventDefault();
+                }
+                if (window.event) {
+                    window.event.returnValue = false;
+                }
+                return;
+            }
+        };
+        
+        var setEventHandlers = function () {          
+            util.addEvent(panels.input, "keydown", handleTab);           
+        };
+        
+        var init = function () {
+            setEventHandlers();
+        };
 
+        init();
+    }
 })();
